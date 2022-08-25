@@ -1,0 +1,65 @@
+mautrix-wsproxy:
+  fullnameOverride: mautrix-wsproxy
+
+  image:
+    repository: dock.mau.dev/mautrix/wsproxy
+    tag: latest@sha256:83a2f5cf550063cfe17aec3b14af2c297315f13c73114723efa73b746a861753
+    pullPolicy: IfNotPresent
+
+  controller:
+    replicas: 1
+
+  secret:
+    LISTEN_ADDRESS: ":8080"
+    APPSERVICE_ID: imessage
+    AS_TOKEN: "" # Set in secrets.values.yaml
+    HS_TOKEN: "" # Set in secrets.values.yaml
+    SYNC_PROXY_URL: http://mautrix-syncproxy.matrix.svc.cluster.local
+    SYNC_PROXY_WSPROXY_URL: http://mautrix-wsproxy.matrix.svc.cluster.local
+    SYNC_PROXY_SHARED_SECRET: "" # Set in secrets.values.yaml
+
+  service:
+    main:
+      ports:
+        http:
+          targetPort: 8080
+
+  ingress:
+    main:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        kubernetes.io/tls-acme: "true"
+        nginx.org/websocket-services: mautrix-wsproxy
+        nginx.ingress.kubernetes.io/proxy-read-timeout: "604800" # 7 days
+        nginx.ingress.kubernetes.io/proxy-send-timeout: "604800" # 7 days
+
+      hosts:
+        - host: proxy.babel1.eu
+          paths:
+            - path: /
+              pathType: Prefix
+
+      tls:
+        - secretName: matrix-tls
+          hosts:
+            - babel1.eu
+            - "*.babel1.eu"
+
+  probes:
+    liveness:
+      enabled: false
+    readiness:
+      enabled: false
+    startup:
+      enabled: false
+
+  # TODO: be more restrictive
+  podSecurityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    runAsNonRoot: false
+  securityContext:
+    capabilities:
+      drop: []
+    readOnlyRootFilesystem: false

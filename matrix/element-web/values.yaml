@@ -1,0 +1,72 @@
+element-web:
+  fullnameOverride: element-web
+
+  replicaCount: 1
+
+  image:
+    repository: dotwee/element-web
+    tag: v1.11.2
+    pullPolicy: IfNotPresent
+
+  defaultServer:
+    url: https://babel1.eu
+    name: Babel1
+    # identity_url: 'https://vector.im'
+
+  ## Element configuration
+  ## Ref: https://github.com/vector-im/element-web/blob/develop/config.sample.json
+  ##
+  config: {}
+
+  serviceAccount:
+    create: false
+
+  extraVolumes:
+    - name: tmpdir
+      emptyDir: {}
+
+  extraVolumeMounts:
+    - name: tmpdir
+      mountPath: /tmp
+      subPath: tmp
+    - name: tmpdir
+      mountPath: /var/cache/nginx
+      subPath: tmp
+
+  # podSecurityContext:
+  #   fsGroup: 2000
+
+  # securityContext:
+  #   capabilities:
+  #     drop:
+  #       - ALL
+  #     add:
+  #       - NET_BIND_SERVICE
+  #   readOnlyRootFilesystem: true
+  #   runAsNonRoot: true
+  #   runAsUser: 1000
+
+  service:
+    type: ClusterIP
+    port: 80
+
+  ingress:
+    enabled: true
+    className: nginx
+    annotations:
+      kubernetes.io/tls-acme: "true"
+    hosts:
+      - web.babel1.eu
+    tls:
+      - secretName: matrix-tls
+        hosts:
+          - babel1.eu
+          - "*.babel1.eu"
+
+  resources:
+    limits:
+      cpu: 100m
+      memory: 128Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi

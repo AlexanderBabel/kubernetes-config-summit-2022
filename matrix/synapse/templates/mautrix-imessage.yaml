@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: mautrix-imessage
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}
+    app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+stringData:
+  registration.yaml: |
+    {{- toYaml (index .Values "mautrix-imessage" "registration") | nindent 4 }}

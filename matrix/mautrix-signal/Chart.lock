@@ -1,0 +1,6 @@
+dependencies:
+- name: mautrix-signal
+  repository: https://charts.alexbabel.com
+  version: 0.1.1
+digest: sha256:5908a65ed55b067e9d907734f8ea1d404c0cd9df4a8c468a6b0557eb8690623b
+generated: "2022-05-19T14:41:56.728014+02:00"

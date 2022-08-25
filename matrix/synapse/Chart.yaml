@@ -1,0 +1,13 @@
+apiVersion: v2
+description: matrix
+type: application
+name: synapse
+version: 0.0.0
+appVersion: 0.0.0
+argocd:
+  enabled: true
+  project: default
+dependencies:
+  - name: matrix-synapse
+    version: 2.3.6
+    repository: https://ananace.gitlab.io/charts

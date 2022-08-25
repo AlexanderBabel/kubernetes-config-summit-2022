@@ -1,0 +1,6 @@
+dependencies:
+- name: element-web
+  repository: https://ananace.gitlab.io/charts
+  version: 1.1.13
+digest: sha256:f5e6c36a757d8482013381f061836d4e4be18e086232d003889a1ac7ebe66474
+generated: "2022-06-07T18:12:09.440155757Z"

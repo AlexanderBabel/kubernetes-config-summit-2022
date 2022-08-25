@@ -1,0 +1,11 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: maubot-config
+type: Opaque
+stringData:
+  config.yaml: |
+    {{- with .Values.maubot.config }}
+      {{- . | toYaml | nindent 4 }}
+    {{- end }}

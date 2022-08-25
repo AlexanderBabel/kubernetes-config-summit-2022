@@ -1,0 +1,2 @@
+secrets.values.yaml diff=sopsdiffer
+secrets.test.values.yaml diff=sopsdiffer

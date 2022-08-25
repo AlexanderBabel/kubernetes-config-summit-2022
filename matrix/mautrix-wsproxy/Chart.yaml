@@ -1,0 +1,14 @@
+apiVersion: v2
+description: matrix
+type: application
+name: mautrix-wsproxy
+version: 0.0.0
+appVersion: 0.0.0
+argocd:
+  enabled: true
+  project: default
+dependencies:
+  - name: common
+    version: 2.7.0
+    repository: https://charts.alexbabel.com
+    alias: mautrix-wsproxy

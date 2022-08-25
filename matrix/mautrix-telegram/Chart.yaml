@@ -1,0 +1,13 @@
+apiVersion: v2
+description: matrix
+type: application
+name: mautrix-telegram
+version: 0.0.0
+appVersion: 0.0.0
+argocd:
+  enabled: true
+  project: default
+dependencies:
+  - name: mautrix-telegram
+    version: 1.0.1
+    repository: https://halkeye.github.io/helm-charts/

@@ -1,0 +1,147 @@
+name: Create diff on updated Helm charts
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "**/templates/*"
+      - "**/*.values.yaml"
+      - "**/values.yaml"
+      - "**/Chart.yaml"
+
+env:
+  conf_live_branch: main
+  conf_ignore_known_labels_containing_versions: true
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+
+    outputs:
+      files: "${{ steps.extract.outputs.files }}"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get changes
+        uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          list-files: shell
+          filters: |
+            changed:
+              - "**/templates/*"
+              - "**/*.values.yaml"
+              - "**/values.yaml"
+              - "**/Chart.yaml"
+
+      - name: Format output
+        id: extract
+        run: ./.github/scripts/format.sh ${{ steps.filter.outputs.changed_files }}
+
+  helm:
+    name: Template HelmReleases
+    runs-on: ubuntu-latest
+
+    if: ${{ needs.changes.outputs.files != '[]' }}
+
+    outputs:
+      changes: "${{ steps.diff.outputs.changes }}"
+
+    needs:
+      - changes
+
+    strategy:
+      matrix:
+        file: ${{ fromJson(needs.changes.outputs.files) }}
+      fail-fast: false
+
+    steps:
+      - name: Setup Kubernetes Tools
+        uses: yokawasa/action-setup-kube-tools@v0.8.2
+        with:
+          setup-tools: |
+            helm
+            yq
+
+      - name: Checkout live branch
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ env.conf_live_branch }}
+          path: live
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v3
+        with:
+          path: pr
+
+      - name: Create diff
+        id: diff
+        run: |
+          helm plugin install https://github.com/jkroepke/helm-secrets || sleep 0
+          ./live/.github/scripts/diff.sh ${{ matrix.file }}
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@v2
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: "Path: `${{ matrix.file }}`"
+
+      - name: Create comment
+        if: steps.fc.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: "${{ fromJSON(steps.diff.outputs.message) }}"
+
+      - name: Update comment
+        if: steps.fc.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          body: "${{ fromJSON(steps.diff.outputs.message) }}"
+          edit-mode: replace
+
+  label:
+    name: Set label on PR
+    runs-on: ubuntu-latest
+
+    needs:
+      - helm
+
+    steps:
+      - name: Get PR
+        uses: actions/github-script@v6
+        id: get-pr
+        with:
+          script: |
+            return github.rest.pulls.get({
+              pull_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            })
+
+      - name: Get Lables
+        id: labels
+        env:
+          RAW_LABELS: ${{ toJSON(fromJSON(steps.get-pr.outputs.result).data.labels) }}
+        run: echo "::set-output name=labels::$(echo $RAW_LABELS | jq '[.[].name]' | tr '\n' ' ')"
+
+      - name: Add label
+        if: "!contains(fromJSON(steps.labels.outputs.labels), 'no changes') && !needs.helm.outputs.changes"
+        uses: actions-ecosystem/action-add-labels@v1
+        with:
+          labels: |
+            no changes
+
+      - name: Remove label
+        if: "contains(fromJSON(steps.labels.outputs.labels), 'no changes') && needs.helm.outputs.changes"
+        uses: actions-ecosystem/action-remove-labels@v1
+        with:
+          labels: |
+            no changes

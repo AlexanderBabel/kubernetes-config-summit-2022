@@ -1,0 +1,13 @@
+apiVersion: v2
+description: matrix
+type: application
+name: element-web
+version: 0.0.0
+appVersion: 0.0.0
+argocd:
+  enabled: true
+  project: default
+dependencies:
+  - name: element-web
+    version: 1.1.13
+    repository: https://ananace.gitlab.io/charts

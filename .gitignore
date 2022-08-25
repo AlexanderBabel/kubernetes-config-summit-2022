@@ -1,0 +1,13 @@
+*secret*
+!*sealed*
+!secrets.values.yaml
+!secrets.test.values.yaml
+!pull-secret/
+**/charts
+!**/templates/*secret*
+!charts/**/templates/*secret*
+.DS_Store
+!/charts
+!/charts/**/common/charts
+live
+pr

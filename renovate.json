@@ -1,0 +1,97 @@
+{
+  "extends": ["config:base", ":disableRateLimiting"],
+  "prHourlyLimit": 0,
+  "dependencyDashboard": true,
+  "packageRules": [
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix",
+      "labels": ["renovate/image", "dep/patch"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat",
+      "labels": ["renovate/image", "dep/minor"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["major"],
+      "commitMessagePrefix": "feat(images)!: ",
+      "labels": ["renovate/image", "dep/major"]
+    },
+    {
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["digest"],
+      "commitMessagePrefix": "feat(images)!: ",
+      "labels": ["renovate/image", "dep/digest"]
+    },
+
+    {
+      "matchDatasources": ["helm"],
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix",
+      "labels": ["renovate/helm", "dep/patch"]
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat",
+      "labels": ["renovate/helm", "dep/minor"]
+    },
+    {
+      "matchDatasources": ["helm"],
+      "matchUpdateTypes": ["major"],
+      "commitMessagePrefix": "feat(helm)!: ",
+      "labels": ["renovate/helm", "dep/major"]
+    },
+
+    {
+      "matchDatasources": ["github-releases"],
+      "matchUpdateTypes": ["patch"],
+      "semanticCommitType": "fix",
+      "labels": ["renovate/github", "dep/patch"]
+    },
+    {
+      "matchDatasources": ["github-releases"],
+      "matchUpdateTypes": ["minor"],
+      "semanticCommitType": "feat",
+      "labels": ["renovate/github", "dep/minor"]
+    },
+    {
+      "matchDatasources": ["github-releases"],
+      "matchUpdateTypes": ["major"],
+      "commitMessagePrefix": "feat(github)!: ",
+      "labels": ["renovate/github", "dep/major"]
+    }
+  ],
+  "regexManagers": [
+    {
+      "fileMatch": [".+\\.yaml$"],
+      "matchStrings": [
+        "mautrixSignal: *\n *repository: *(?<depName>.*?) *\n *tag: *(?<currentValue>.*)@(?<currentDigest>.*) *\n",
+        "signald: *\n *repository: *(?<depName>.*?) *\n *tag: *(?<currentValue>.*)@(?<currentDigest>.*) *\n"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "fileMatch": [".+\\.yaml$"],
+      "matchStrings": [
+        "github.com\\/(?<depName>.*?) --version (?<currentValue>.*) \\|",
+        "github.com\\/(?<depName>.*?)\\/releases\\/download\\/(?<currentValue>.*)\\/sops-.*\\.linux",
+        "github.com\\/(?<depName>.*?)\\/releases\\/download\\/.*\\/sops-(?<currentValue>.*)\\.linux"
+      ],
+      "datasourceTemplate": "github-releases"
+    }
+  ],
+  "hostRules": [
+    {
+      "matchHost": "ghcr.io",
+      "username": "token",
+      "encrypted": {
+        "password": "W15niQcsxMOa0ikMRNA5mcwiZ6/3bqdtpr1QvfGxfqHVsQp8CHN6YGKw8k/mZpGdMOnY83nzo7za60wDD19UE5mVqwmSXyWU58xQ+m6hlhl+UKeRm7AEYA6HWrpFBYOmjL3nsdxDw883sq+DAl8Zt8MTtEcRRXKwPyEuVUPnLMJ5Itxro/qhcBMineLbZ1TyXKzAeX+lmnptsJIs31uUfHf08s7Lo4XBXN3LjZB5ItijiTyi2OTH4d6m7PbuDCKxDaH9z6Wa64x9Iqj3irZL6+ZN5rp83uQg/f96gh/JazmhGd9RZtaB0vbNU40du6aqJFCDxLleQElxskb9XdG6cw=="
+      }
+    }
+  ]
+}

@@ -1,0 +1,215 @@
+maubot:
+  fullnameOverride: maubot
+
+  image:
+    repository: alexbabel/maubot
+    tag: v0.3.1
+
+  service:
+    main:
+      ports:
+        http:
+          targetPort: 8080
+
+  controller:
+    strategy: Recreate
+
+  probes:
+    liveness:
+      enabled: false
+
+    readiness:
+      enabled: false
+
+    startup:
+      enabled: false
+
+  ingress:
+    main:
+      enabled: true
+      annotations:
+        kubernetes.io/tls-acme: "true"
+        nginx.ingress.kubernetes.io/proxy-body-size: 128m
+        # nginx.ingress.kubernetes.io/auth-url: "http://babel1.auth.svc.cluster.local/oauth2/auth"
+        # nginx.ingress.kubernetes.io/auth-signin: "https://auth.babel1.eu/oauth2/start?rd=https%3A%2F%2F$host$request_uri"
+      ingressClassName: "nginx"
+      hosts:
+        - host: bot.babel1.eu
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: matrix-tls
+          hosts:
+            - babel1.eu
+            - "*.babel1.eu"
+
+  persistence:
+    data:
+      enabled: true
+      mountPath: /data
+      accessMode: ReadWriteOnce
+      size: 100Mi
+      storageClass: local-path
+      volumeName: pvc-b41492c3-77f9-468f-bcd4-1a344e8cdec9	
+      emptyDir:
+        enabled: false
+    config:
+      enabled: true
+      mountPath: /data/config-ro.yaml
+      subPath: config.yaml
+      type: custom
+      volumeSpec:
+        secret:
+          secretName: maubot-config
+
+  initContainers:
+    copy:
+      image: alpine:3.16
+      command: ["sh", "-c", "cp /data/config-ro.yaml /data/config.yaml"]
+      volumeMounts:
+        - name: config
+          mountPath: /data/config-ro.yaml
+          subPath: config.yaml
+        - name: data
+          mountPath: /data
+
+  # TODO: be more restrictive
+  podSecurityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    runAsNonRoot: false
+  securityContext:
+    capabilities:
+      drop: []
+    readOnlyRootFilesystem: false
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: kubernetes.io/hostname
+                operator: In
+                values:
+                  - bravo
+
+  tolerations:
+    - key: dedicated
+      operator: Equal
+      value: bravo
+      effect: NoSchedule
+
+  config:
+    database: "" # Set in secrets.values.yaml
+
+    # Separate database URL for the crypto database. "default" means use the same database as above.
+    crypto_database: default
+
+    plugin_directories:
+      # The directory where uploaded new plugins should be stored.
+      upload: /data/plugins
+      # The directories from which plugins should be loaded.
+      # Duplicate plugin IDs will be moved to the trash.
+      load:
+        - /data/plugins
+      # The directory where old plugin versions and conflicting plugins should be moved.
+      # Set to "delete" to delete files immediately.
+      trash: /data/trash
+      # The directory where plugin databases should be stored.
+      db: /data/plugins
+
+    server:
+      # The IP and port to listen to.
+      hostname: 0.0.0.0
+      port: 8080
+      # Public base URL where the server is visible.
+      public_url: https://bot.babel1.eu
+      # The base management API path.
+      base_path: /_matrix/maubot/v1
+      # The base path for the UI.
+      ui_base_path: /_matrix/maubot
+      # The base path for plugin endpoints. The instance ID will be appended directly.
+      plugin_base_path: /_matrix/maubot/plugin/
+      # Override path from where to load UI resources.
+      # Set to false to using pkg_resources to find the path.
+      override_resource_path: false
+      # The base appservice API path. Use / for legacy appservice API and /_matrix/app/v1 for v1.
+      appservice_base_path: /_matrix/app/v1
+      # The shared secret to sign API access tokens.
+      # Set to "generate" to generate and save a new token at startup.
+      unshared_secret: "" # Set in secrets.values.yaml
+
+    # Known homeservers. This is required for the `mbc auth` command and also allows
+    # more convenient access from the management UI. This is not required to create
+    # clients in the management UI, since you can also just type the homeserver URL
+    # into the box there.
+    homeservers:
+      babel1.eu:
+        # Client-server API URL
+        url: https://babel1.eu
+        # url: http://matrix-synapse.matrix.svc.cluster.local
+        # registration_shared_secret from synapse config
+        # You can leave this empty if you don't have access to the homeserver.
+        # When this is empty, `mbc auth --register` won't work, but `mbc auth` (login) will.
+        secret: "" # Set in secrets.values.yaml
+      dendrite.babel.sh:
+        # Client-server API URL
+        url: http://dendrite.matrix.svc.cluster.local:8008
+        # registration_shared_secret from synapse config
+        # You can leave this empty if you don't have access to the homeserver.
+        # When this is empty, `mbc auth --register` won't work, but `mbc auth` (login) will.
+        secret: "" # Set in secrets.values.yaml
+      babel.sh:
+        # Client-server API URL
+        url: http://conduit.matrix.svc.cluster.local
+        # registration_shared_secret from synapse config
+        # You can leave this empty if you don't have access to the homeserver.
+        # When this is empty, `mbc auth --register` won't work, but `mbc auth` (login) will.
+        secret: ""
+
+    # List of administrator users. Plaintext passwords will be bcrypted on startup. Set empty password
+    # to prevent normal login. Root is a special user that can't have a password and will always exist.
+    admins:
+      root: ""
+      alex: $2b$10$81Wai6RWc9nPEl8HFrCHbetnCsQVaxjm3PVg6pSbb17fRb7nJU6TG
+
+    # API feature switches.
+    api_features:
+      login: true
+      plugin: true
+      plugin_upload: true
+      instance: true
+      instance_database: true
+      client: true
+      client_proxy: true
+      client_auth: true
+      dev_open: true
+      log: true
+
+    # Python logging configuration.
+    #
+    # See section 16.7.2 of the Python documentation for more info:
+    # https://docs.python.org/3.6/library/logging.config.html#configuration-dictionary-schema
+    logging:
+      version: 1
+      formatters:
+        colored:
+          (): maubot.lib.color_log.ColorFormatter
+          format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
+        normal:
+          format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
+      handlers:
+        console:
+          class: logging.StreamHandler
+          formatter: colored
+      loggers:
+        maubot:
+          level: INFO
+        mau:
+          level: INFO
+        aiohttp:
+          level: INFO
+      root:
+        level: INFO
+        handlers: [console]

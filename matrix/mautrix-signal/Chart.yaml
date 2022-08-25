@@ -1,0 +1,13 @@
+apiVersion: v2
+description: matrix
+type: application
+name: mautrix-signal
+version: 0.0.0
+appVersion: 0.0.0
+argocd:
+  enabled: true
+  project: default
+dependencies:
+  - name: mautrix-signal
+    version: 0.1.1
+    repository: https://charts.alexbabel.com

@@ -1,0 +1,6 @@
+dependencies:
+- name: common
+  repository: https://charts.alexbabel.com
+  version: 2.7.0
+digest: sha256:e9a55b7f99155194cbccdf85b029a3115b2e21e1fd0a767ebcefa12c128d9862
+generated: "2022-08-19T18:40:22.060370786Z"

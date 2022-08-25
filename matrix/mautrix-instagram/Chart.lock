@@ -1,0 +1,6 @@
+dependencies:
+- name: mautrix-instagram
+  repository: https://halkeye.github.io/helm-charts/
+  version: 1.0.0
+digest: sha256:0fbdc200a03a2168c537c3e69078f0aed008e4c4e5db2efe3ab7426080589ca7
+generated: "2022-04-21T23:49:10.38573+02:00"

@@ -1,0 +1,60 @@
+mautrix-syncproxy:
+  fullnameOverride: mautrix-syncproxy
+
+  image:
+    repository: dock.mau.dev/mautrix/syncproxy
+    tag: latest@sha256:6f95eeb9aaffa55a4a8ce685c6ad81308023ee383bec1e3b74fea46a1cb5e808
+    pullPolicy: IfNotPresent
+
+  controller:
+    replicas: 1
+
+  secret:
+    LISTEN_ADDRESS: ":8080"
+    DATABASE_URL: "" # Set in secrets.values.yaml
+    HOMESERVER_URL: https://babel1.eu
+    # HOMESERVER_URL: http://matrix-synapse.matrix.svc.cluster.local
+    SHARED_SECRET: "" # Set in secrets.values.yaml
+
+  service:
+    main:
+      ports:
+        http:
+          targetPort: 8080
+
+  ingress:
+    main:
+      enabled: true
+      ingressClassName: nginx
+      annotations:
+        kubernetes.io/tls-acme: "true"
+
+      hosts:
+        - host: sync.babel1.eu
+          paths:
+            - path: /
+              pathType: Prefix
+
+      tls:
+        - secretName: matrix-tls
+          hosts:
+            - babel1.eu
+            - "*.babel1.eu"
+
+  probes:
+    liveness:
+      enabled: false
+    readiness:
+      enabled: false
+    startup:
+      enabled: false
+
+  # TODO: be more restrictive
+  podSecurityContext:
+    runAsUser: 0
+    runAsGroup: 0
+    runAsNonRoot: false
+  securityContext:
+    capabilities:
+      drop: []
+    readOnlyRootFilesystem: false

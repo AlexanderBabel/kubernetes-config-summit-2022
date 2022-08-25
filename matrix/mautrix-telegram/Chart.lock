@@ -1,0 +1,6 @@
+dependencies:
+- name: mautrix-telegram
+  repository: https://halkeye.github.io/helm-charts/
+  version: 1.0.1
+digest: sha256:bac31b1239a43b5a8e47aa7ecbff67f0ec3950d470d945290e7fe94346f27eec
+generated: "2021-12-19T09:08:51.2888+01:00"

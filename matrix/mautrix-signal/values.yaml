@@ -1,0 +1,162 @@
+mautrix-signal:
+  fullnameOverride: mautrix-signal
+
+  strategy:
+    type: Recreate
+
+  image:
+    mautrixSignal:
+      repository: dock.mau.dev/mautrix/signal
+      tag: v0.3.0
+      pullPolicy: IfNotPresent
+    signald:
+      repository: signald/signald
+      tag: 0.20.0
+      pullPolicy: IfNotPresent
+
+  env: [] # Set in secrets.values.yaml
+
+  podSecurityContext:
+    {}
+    # fsGroup: 2000
+
+  securityContext:
+    {}
+    # privileged: true
+    # capabilities:
+    #   drop:
+    #   - ALL
+    # readOnlyRootFilesystem: true
+    # runAsNonRoot: true
+    # runAsUser: 1000
+
+  probes:
+    liveness:
+      failureThreshold: 5
+      periodSeconds: 86400 # once a day
+    readiness:
+      failureThreshold: 5
+      periodSeconds: 30
+    startup:
+      initialDelaySeconds: 5
+      failureThreshold: 30
+      periodSeconds: 10
+
+  # service:
+  #   port: 80
+
+  config:
+    homeserver:
+      address: https://babel1.eu
+      # address: http://matrix-synapse.matrix.svc.cluster.local
+      domain: babel1.eu
+
+    appservice:
+      address: http://mautrix-signal.matrix.svc.cluster.local
+      port: 8080
+
+      database: "" # Set in secrets.values.yaml
+
+      as_token: "" # Set in secrets.values.yaml
+      hs_token: "" # Set in secrets.values.yaml
+
+    # Prometheus telemetry config. Requires prometheus-client to be installed.
+    metrics:
+      enabled: false
+      listen_port: 8000
+
+    bridge:
+      double_puppet_allow_discovery: true
+      login_shared_secret: "" # Set in secrets.values.yaml
+      # End-to-bridge encryption support options. These require matrix-nio to be installed with pip
+      # and login_shared_secret to be configured in order to get a device for the bridge bot.
+      #
+      # Additionally, https://github.com/matrix-org/synapse/pull/5758 is required if using a normal
+      # application service.
+      encryption:
+        # Allow encryption, work in group chat rooms with e2ee enabled
+        allow: true
+        # Default to encryption, force-enable encryption in all portals the bridge creates
+        # This will cause the bridge bot to be in private chats for the encryption to work properly.
+        default: true
+        # Options for automatic key sharing.
+        key_sharing:
+          # Enable key sharing? If enabled, key requests for rooms where users are in will be fulfilled.
+          # You must use a client that supports requesting keys from other users to use this feature.
+          allow: true
+          # Require the requesting device to have a valid cross-signing signature?
+          # This doesn't require that the bridge has verified the device, only that the user has verified it.
+          # Not yet implemented.
+          require_cross_signing: false
+          # Require devices to be verified by the bridge?
+          # Verification by the bridge is not yet implemented.
+          require_verification: false
+
+      provisioning:
+        enabled: true
+        shared_secret: "" # Set in secrets.values.yaml
+
+      # Permissions for using the bridge.
+      # Permitted values:
+      #       user - Use the bridge with puppeting.
+      #      admin - Use and administrate the bridge.
+      # Permitted keys:
+      #        * - All Matrix users
+      #   domain - All users on that homeserver
+      #     mxid - Specific user
+      permissions:
+        "@alex:babel1.eu": "admin"
+        "babel1.eu": "user"
+        "keks.club": "user"
+
+    logging:
+      version: 1
+      formatters:
+        colored:
+          (): mautrix_signal.util.ColorFormatter
+          format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
+        normal:
+          format: "[%(asctime)s] [%(levelname)s@%(name)s] %(message)s"
+      handlers:
+        console:
+          class: logging.StreamHandler
+          formatter: colored
+      loggers:
+        mau:
+          level: INFO
+        aiohttp:
+          level: WARN
+      root:
+        level: INFO
+        handlers: [console]
+
+  registration:
+    id: signal
+    as_token: "" # Set in secrets.values.yaml
+    hs_token: "" # Set in secrets.values.yaml
+    namespaces:
+      users:
+        - exclusive: true
+          regex: '@signal_.*:babel1\.eu'
+        - exclusive: true
+          regex: '@signalbot:babel1\.eu'
+      aliases:
+        - exclusive: true
+          regex: '#signal_.*:babel1\.eu'
+    url: http://mautrix-signal.matrix.svc.cluster.local:8080
+    sender_localpart: "" # Set in secrets.values.yaml
+    rate_limited: false
+
+  resources:
+    {}
+    # limits:
+    #  cpu: 100m
+    #  memory: 128Mi
+    # requests:
+    #  cpu: 100m
+    #  memory: 128Mi
+  persistence:
+    enabled: false
+    size: 100Mi
+    storageClassName: local-path
+    volumeName: pvc-3644e2c4-0cbc-4901-9ed2-19a970e0a2df
