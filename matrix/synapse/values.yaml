@@ -135,21 +135,21 @@ matrix-synapse:
         emptyDir: {}
 
       # Bridges
-      - name: imessage
-        secret:
-          secretName: mautrix-imessage
-      - name: signal
-        secret:
-          secretName: mautrix-signal
-      - name: telegram
-        secret:
-          secretName: mautrix-telegram
-      - name: whatsapp
-        secret:
-          secretName: mautrix-whatsapp
-      - name: instagram
-        secret:
-          secretName: mautrix-instagram
+      # - name: imessage
+      #   secret:
+      #     secretName: mautrix-imessage
+      # - name: signal
+      #   secret:
+      #     secretName: mautrix-signal
+      # - name: telegram
+      #   secret:
+      #     secretName: mautrix-telegram
+      # - name: whatsapp
+      #   secret:
+      #     secretName: mautrix-whatsapp
+      # - name: instagram
+      #   secret:
+      #     secretName: mautrix-instagram
 
     extraVolumeMounts: &extraVolumeMounts
       - name: tmpdir
@@ -157,21 +157,21 @@ matrix-synapse:
         subPath: tmp
 
       # Bridges
-      - name: imessage
-        mountPath: /bridges/imessage.yaml
-        subPath: registration.yaml
-      - name: signal
-        mountPath: /bridges/signal.yaml
-        subPath: registration.yaml
-      - name: telegram
-        mountPath: /bridges/telegram.yaml
-        subPath: registration.yaml
-      - name: whatsapp
-        mountPath: /bridges/whatsapp.yaml
-        subPath: registration.yaml
-      - name: instagram
-        mountPath: /bridges/instagram.yaml
-        subPath: registration.yaml
+      # - name: imessage
+      #   mountPath: /bridges/imessage.yaml
+      #   subPath: registration.yaml
+      # - name: signal
+      #   mountPath: /bridges/signal.yaml
+      #   subPath: registration.yaml
+      # - name: telegram
+      #   mountPath: /bridges/telegram.yaml
+      #   subPath: registration.yaml
+      # - name: whatsapp
+      #   mountPath: /bridges/whatsapp.yaml
+      #   subPath: registration.yaml
+      # - name: instagram
+      #   mountPath: /bridges/instagram.yaml
+      #   subPath: registration.yaml
 
     podSecurityContext: &podSecurityContext
       fsGroup: 666
