@@ -68,12 +68,12 @@ matrix-synapse:
       msc2716_enabled: true
       spaces_enabled: true
 
-    app_service_config_files:
-      - /bridges/imessage.yaml
-      - /bridges/signal.yaml
-      - /bridges/telegram.yaml
-      - /bridges/whatsapp.yaml
-      - /bridges/instagram.yaml
+    # app_service_config_files:
+    #   - /bridges/imessage.yaml
+    #   - /bridges/signal.yaml
+    #   - /bridges/telegram.yaml
+    #   - /bridges/whatsapp.yaml
+    #   - /bridges/instagram.yaml
 
     max_spider_size: 10M
     max_upload_size: 32M
