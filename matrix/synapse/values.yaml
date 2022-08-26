@@ -194,26 +194,6 @@ matrix-synapse:
         cpu: 200m
         memory: 512Mi
 
-    affinity: &affinity
-      nodeAffinity:
-        requiredDuringSchedulingIgnoredDuringExecution:
-          nodeSelectorTerms:
-            - matchExpressions:
-                - key: beta.kubernetes.io/arch
-                  operator: In
-                  values:
-                    - amd64
-                - key: kubernetes.io/hostname
-                  operator: In
-                  values:
-                    - bravo
-
-    tolerations: &tolerations
-      - key: dedicated
-        operator: Equal
-        value: bravo
-        effect: NoSchedule
-
   wellknown:
     enabled: true
     replicaCount: 1
@@ -353,10 +333,6 @@ matrix-synapse:
       volumes: *extraVolumes
 
       volumeMounts: *extraVolumeMounts
-
-      affinity: *affinity
-
-      tolerations: *tolerations
 
     generic_worker:
       enabled: true
