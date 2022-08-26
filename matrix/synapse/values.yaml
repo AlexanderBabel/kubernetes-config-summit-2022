@@ -251,8 +251,9 @@ matrix-synapse:
     enabled: true
 
     image:
-      repository: redis
-      tag: 7.0.0-alpine3.15 
+      registry: ghcr.io
+      repository: zcube/bitnami-compat/redis
+      tag: 7.0.4-debian-11-r23
 
     auth:
       password: "set in secrets.values.yaml" # Set in secrets.values.yaml
