@@ -19,7 +19,7 @@ matrix-synapse:
   image:
     repository: alexbabel/synapse
     tag: v1.64.0
-    pullPolicy: IfNotPresent
+    pullPolicy: Always
 
   signingkey:
     key: "set in secrets.values.yaml" # Set in secrets.values.yaml
