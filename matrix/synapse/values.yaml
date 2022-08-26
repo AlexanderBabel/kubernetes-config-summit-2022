@@ -270,6 +270,10 @@ matrix-synapse:
   redis:
     enabled: true
 
+    image:
+      repository: redis
+      tag: 7.0.0-alpine3.15 
+
     auth:
       password: "set in secrets.values.yaml" # Set in secrets.values.yaml
 
