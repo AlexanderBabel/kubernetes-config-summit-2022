@@ -13,16 +13,6 @@ mautrix-imessage:
     sender_localpart: "" # Set in secrets.values.yaml
     rate_limited: false
 
-s3CronJob:
-  pingUrl: "" # Set in secrets.values.yaml
-  script: /usr/local/bin/s3_media_upload
-  mediaStore: /synapse/data/media
-  region: eu-central-1
-  secretKey: "" # Set in secrets.values.yaml
-  accessKeyId: AKIA5JR4OSXIDYX2Y25Z
-  bucket: babel1-matrix-assets
-  cacheAge: 1m
-
 matrix-synapse:
   fullnameOverride: matrix-synapse
 
@@ -46,10 +36,8 @@ matrix-synapse:
     reportStats: false
 
     turnUris:
-      # - turn:turn.babel1.eu?transport=udp
-      # - turn:turn.babel1.eu?transport=tcp
-      - turns:turn.babel1.eu?transport=udp
-      - turns:turn.babel1.eu?transport=tcp
+      - turn:turn.babel1.eu?transport=udp
+      - turn:turn.babel1.eu?transport=tcp
     turnSecret: "set in secrets.values.yaml" # Set in secrets.values.yaml
 
     enableRegistration: false
@@ -271,27 +259,22 @@ matrix-synapse:
   externalPostgresql:
     host: postgresql.database.svc.cluster.local
     port: 5432
-    username: matrix
+    username: synapse
     password: "set in secrets.values.yaml" # Set in secrets.values.yaml
 
-    database: matrix
+    database: synapse
     # sslmode: prefer
 
     extraArgs: {}
 
   redis:
-    enabled: false
+    enabled: true
 
     auth:
       password: "set in secrets.values.yaml" # Set in secrets.values.yaml
 
-  externalRedis:
-    host: redis-master.matrix.svc.cluster.local
-    port: 6379
-    password: "set in secrets.values.yaml" # Set in secrets.values.yaml
-
   persistence:
-    enabled: true
+    enabled: false
     # existingClaim: synapse-data
 
     storageClass: local-path
@@ -320,7 +303,7 @@ matrix-synapse:
     targetPort: http
 
   ingress:
-    enabled: true
+    enabled: false
 
     annotations:
       kubernetes.io/tls-acme: "true"
