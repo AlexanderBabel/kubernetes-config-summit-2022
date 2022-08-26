@@ -381,7 +381,7 @@ matrix-synapse:
     ##
     federation_sender:
       enabled: true
-      replicaCount: 2
+      replicaCount: 1
 
     federation_reader:
       enabled: true
