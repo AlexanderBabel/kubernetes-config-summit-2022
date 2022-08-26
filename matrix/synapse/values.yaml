@@ -274,7 +274,7 @@ matrix-synapse:
 
     image:
       repository: alpine
-      tag: 3.16.0
+      tag: 3.16.2
       pullPolicy: IfNotPresent
 
     resources:
