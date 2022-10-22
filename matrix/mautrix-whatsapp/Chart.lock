@@ -1,6 +1,6 @@
 dependencies:
 - name: mautrix-whatsapp
   repository: https://halkeye.github.io/helm-charts/
-  version: 1.0.1
-digest: sha256:d1b233656f8861721a6c321c918682ea94d2168edf2c6f5a73f3aa3a2b27c415
-generated: "2021-12-19T09:15:10.649332+01:00"
+  version: 1.0.2
+digest: sha256:f1da6593b1078d5d7f78a3e18e94c16fea5916f40226eda89de91d13b01281da
+generated: "2022-10-22T20:42:51.611665105Z"
