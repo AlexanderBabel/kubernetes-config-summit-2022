@@ -9,5 +9,5 @@ argocd:
   project: default
 dependencies:
   - name: matrix-synapse
-    version: 2.3.6
+    version: 2.7.5
     repository: https://ananace.gitlab.io/charts

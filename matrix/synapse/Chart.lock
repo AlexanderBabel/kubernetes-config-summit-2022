@@ -1,6 +1,6 @@
 dependencies:
 - name: matrix-synapse
   repository: https://ananace.gitlab.io/charts
-  version: 2.3.6
-digest: sha256:19be9130eaf97f8a808bd4f81185bf172fdc493fb4717ad1099bd2d7e3e01039
-generated: "2022-07-22T11:26:30.700973141Z"
+  version: 2.7.5
+digest: sha256:75c76301ecc6ac8dd129331a3f372c81c9da14a7826b6e6ec664bfd0f177a2d6
+generated: "2022-10-26T14:43:22.936739792Z"
